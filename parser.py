@@ -17,7 +17,7 @@ if file_type == "mpstat":
         if not len (parsedline):
                 continue
         if parsedline[2] =="all":
-            data = "%d\t%s" % (time, parsedline[3])
+            data = "%d\t%f" % (time, (100.0-float(parsedline[12])))
             print (data)
             write_file.write (data + "\n")
             time = time + 1
@@ -45,7 +45,33 @@ elif file_type == "iostat":
             print (data)
             write_file.write (data + "\n")
             time = time + 1
-            
+
+elif file_type == "perf":
+    write_file.write ("time[s]\tL1DLM\tL1Dload\tLLCload\tLLCLM\tLLCstore\tLLCSM\tcycles\instructions\n")
+    for line in lines:
+        parsedline = line.split ()
+        if not len (parsedline):
+            continue
+        if parsedline[2] == "L1-dcache-load-misses":
+            data = "%d\t%s\t" % (time, (parsedline[1]))
+        if parsedline[2] == "L1-dcache-loads":
+            data += "%s\t" % (parsedline[1])
+        if parsedline[2] == "LLC-load-misses":
+            data += "%s\t" % (parsedline[1])
+        if parsedline[2] == "LLC-loads":
+            data += "%s\t" % (parsedline[1])
+        if parsedline[2] == "LLC-store-misses":
+            data += "%s\t" % (parsedline[1])
+        if parsedline[2] == "LLC-stores":
+            data += "%s\t" % (parsedline[1])
+        if parsedline[2] == "cycles" or parsedline[2] == "cpu-cycles":
+            data += "%s\t" % (parsedline[1])
+        if parsedline[2] == "instructions":
+            data += "%s\t" % (parsedline[1])
+            print (data)
+            write_file.write (data + "\n")
+            time = time + 1
+
 else:
     print ("not supported file_type.")
 
